@@ -1,20 +1,61 @@
+import { useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
-import Container from '../styles/pages/Home';
+import { useRouter } from 'next/router';
+import Cookie from 'js-cookie';
+import api from '../services/api';
 
-const HomePage: React.FC = () => {
+const Home: React.FC = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+
+  const router = useRouter();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    await api
+      .post('/user/login', {
+        username,
+        password,
+      })
+      .then((response) => {
+        const { token } = response.data;
+        Cookie.set('TOKEN_STORAGE_KEY', token, { expires: 1 });
+        router.push('/dashboard');
+      })
+      .catch((error) => {
+        console.error(error.response.data);
+      });
+  };
+
   return (
-    <Container>
+    <>
       <Head>
-        <title>HomePage</title>
+        <title>Login</title>
       </Head>
-      <h1>test h1</h1>
-      <p>Test123</p>
-      <Link href='/about'>
-        <a>Ir para sobre</a>
-      </Link>
-    </Container>
+      <p>Login</p>
+      <form onSubmit={handleLogin}>
+        <label htmlFor='username'>
+          <input
+            name='username'
+            type='text'
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </label>
+
+        <label htmlFor='password'>
+          <input
+            name='password'
+            type='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+
+        <button type='submit'>Login</button>
+      </form>
+    </>
   );
 };
 
-export default HomePage;
+export default Home;
