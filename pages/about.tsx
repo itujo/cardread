@@ -2,19 +2,19 @@ import Head from 'next/head';
 import Link from 'next/link';
 import Container from '../styles/pages/Home';
 
-const HomePage: React.FC = () => {
+const About: React.FC = () => {
   return (
     <Container>
       <Head>
-        <title>HomePage</title>
+        <title>About</title>
       </Head>
-      <h1>test h1</h1>
-      <p>Test123</p>
-      <Link href='/about'>
-        <a>Ir para sobre</a>
+      <h1>About</h1>
+      <p>Sobre o site</p>
+      <Link href='/'>
+        <a>Voltar para home</a>
       </Link>
     </Container>
   );
 };
 
-export default HomePage;
+export default About;
