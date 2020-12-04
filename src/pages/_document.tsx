@@ -44,15 +44,7 @@ export default class MyDocument extends Document {
         <Head>
           <meta charSet='utf-8' />
 
-          <link
-            href='https://fonts.googleapis.com/css?family=Roboto:400,500,700'
-            rel='stylesheet'
-          />
-
-          <link
-            rel='icon'
-            href='http://www.splogbrasil.com.br/images/favicon-96x96.png'
-          />
+          <link rel='icon' href='/favicon.ico' />
         </Head>
         <body>
           <Main />
