@@ -4,23 +4,22 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Cookie from 'js-cookie';
 import { FiLogIn } from 'react-icons/fi';
-import { Button, Container, TextField } from '@material-ui/core';
-import { ThemeProvider, withStyles } from '@material-ui/styles';
 import api from '../services/api';
-import { muiTheme } from '../styles/theme';
+import Container, { Button, Input, Logo } from '../styles/pages';
 
-const Home: React.FC = (props) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+const Home: React.FC = () => {
+  const [textUser, setTextUser] = useState('');
+  const [textPass, setTextPass] = useState('');
 
   const router = useRouter();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
+    console.log(textUser, textPass);
     await api
       .post('/user/login', {
-        username,
-        password,
+        username: textUser,
+        password: textPass,
       })
       .then((response) => {
         const { token } = response.data;
@@ -36,56 +35,29 @@ const Home: React.FC = (props) => {
   };
 
   return (
-    <>
+    <Container>
       <Head>
         <title>Login</title>
       </Head>
-      <Container maxWidth='md'>
-        <ThemeProvider theme={muiTheme}>
-          <h2>Login</h2>
+      <Logo src='/logo.png' alt='' />
+      <Input
+        type='text'
+        placeholder='Usuário'
+        autoFocus
+        onChange={(e) => setTextUser(e.target.value)}
+      />
 
-          <form onSubmit={handleLogin}>
-            <TextField
-              color='primary'
-              id='username'
-              placeholder='Usuário'
-              type='text'
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              variant='outlined'
-              InputProps={{
-                style: {
-                  background: 'white',
-                },
-              }}
-            />
-
-            <TextField
-              color='primary'
-              id='password'
-              placeholder='Senha'
-              type='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              variant='outlined'
-              InputProps={{
-                style: {
-                  background: 'white',
-                },
-              }}
-            />
-            <Button
-              type='submit'
-              variant='contained'
-              color='primary'
-              startIcon={<FiLogIn />}
-            >
-              Login
-            </Button>
-          </form>
-        </ThemeProvider>
-      </Container>
-    </>
+      <Input
+        type='password'
+        placeholder='Senha'
+        autoFocus
+        onChange={(e) => setTextPass(e.target.value)}
+      />
+      <Button onClick={handleLogin}>
+        <FiLogIn />
+        &nbsp;ENTRAR
+      </Button>
+    </Container>
   );
 };
 
