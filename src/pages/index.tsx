@@ -1,21 +1,37 @@
+/* eslint-disable no-console */
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Cookie from 'js-cookie';
+import jwtDecode from 'jwt-decode';
 import { FiLogIn } from 'react-icons/fi';
+import { Button } from 'react-bootstrap';
 import api from '../services/api';
-import Container, { Button, Input, Logo } from '../styles/pages';
+import Container, { Input, Logo } from '../styles/pages';
 
 const Home: React.FC = () => {
   const [textUser, setTextUser] = useState('');
   const [textPass, setTextPass] = useState('');
 
+  const userField = useRef(null);
+  const passField = useRef(null);
+
   const router = useRouter();
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (userField.current) {
+        setTextUser(userField.current.value);
+        setTextPass(passField.current.value);
+        clearInterval(interval);
+      }
+    }, 100);
+  });
+
   const handleLogin = async (e) => {
-    // e.preventDefault();
-    console.log(textUser, textPass);
+    e.preventDefault();
+
     await api
       .post('/user/login', {
         username: textUser,
@@ -23,8 +39,15 @@ const Home: React.FC = () => {
       })
       .then((response) => {
         const { token } = response.data;
-        Cookie.set('TOKEN_STORAGE_KEY', token, { expires: 1 });
-        router.push('/dashboard');
+        const { isAdmin } = jwtDecode(token);
+
+        if (isAdmin) {
+          Cookie.set('TOKEN_STORAGE_KEY', token, { expires: 1 });
+          router.push('/dashboard');
+        } else {
+          Cookie.set('TOKEN_STORAGE_KEY', token, { expires: 1 });
+          router.push('/reader');
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -39,24 +62,31 @@ const Home: React.FC = () => {
       <Head>
         <title>Login</title>
       </Head>
-      <Logo src='/logo.png' alt='' />
-      <Input
-        type='text'
-        placeholder='Usuário'
-        autoFocus
-        onChange={(e) => setTextUser(e.target.value)}
-      />
+      <form onSubmit={handleLogin}>
+        <Container>
+          <Logo src='/logo.png' alt='' />
+          <Input
+            ref={userField}
+            type='text'
+            placeholder='Usuário'
+            autoFocus
+            value={textUser}
+            onChange={(e) => setTextUser(e.target.value)}
+          />
 
-      <Input
-        type='password'
-        placeholder='Senha'
-        autoFocus
-        onChange={(e) => setTextPass(e.target.value)}
-      />
-      <Button onClick={handleLogin}>
-        <FiLogIn />
-        &nbsp;ENTRAR
-      </Button>
+          <Input
+            ref={passField}
+            type='password'
+            placeholder='Senha'
+            onChange={(e) => setTextPass(e.target.value)}
+          />
+          <>&nbsp;</>
+          <Button type='submit' variant='warning'>
+            <FiLogIn />
+            &nbsp;ENTRAR
+          </Button>
+        </Container>
+      </form>
     </Container>
   );
 };
